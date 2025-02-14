@@ -23,4 +23,9 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper::toUserDetailsDto)
                 .orElseThrow(() -> new ObjectNotFoundException("No se encontró el usuario con nombre [" + username+ "]"));
     }
+
+    @Override
+    public UserDetailsDto getProfile(String username) {
+        return null;
+    }
 }

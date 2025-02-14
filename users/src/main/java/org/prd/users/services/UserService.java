@@ -5,4 +5,5 @@ import org.prd.users.persistence.dto.UserDetailsDto;
 public interface UserService {
 
     UserDetailsDto findByUsername(String username);
+    UserDetailsDto getProfile(String username);
 }
