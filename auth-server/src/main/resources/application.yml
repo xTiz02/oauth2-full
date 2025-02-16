@@ -1,5 +1,35 @@
 #Eureka
 eureka:
+  instance:
+    instance-id: true
   client:
+    fetch-registry: true
+    register-with-eureka: true
     service-url:
       defaultZone: http://discover1:secret1@localhost:8761/eureka
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 111
+            client-secret: 111
+            scope:
+              - email
+              - profile
+              - address
+              - phone
+            authorization-grant-type: authorization_code
+            client-name: Google
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://accounts.google.com/o/oauth2/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: email
+            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+            issuer-uri: https://accounts.google.com
+#View the OpenID Connect Discovery Document
+#http://localhost:9595/authorization-server/.well-known/openid-configuration

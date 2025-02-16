@@ -18,14 +18,15 @@ public class GlobalHandlerException {
     @ExceptionHandler(ObjectNotFoundException.class)
     public ResponseEntity<ApiResponse> handleResourceException(ObjectNotFoundException e, WebRequest webRequest){
         log.error(String.format("Recurso no encontrado en %s: %s",webRequest.getDescription(false), e.getMessage()));
-        return new ResponseEntity<>(new ApiResponse(e.getMessage(),LocalDateTime.now(),false), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ApiResponse(e.getMessage(),LocalDateTime.now().toString(),false), HttpStatus.NOT_FOUND);
     }
 
     //Controla los errores no esperados
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handlerException(Exception e,
                                                         WebRequest webRequest) {
+        e.printStackTrace();
         log.error(String.format("Error inesperado en %s: %s",webRequest.getDescription(false), e.getMessage()));
-        return new ResponseEntity<>(new ApiResponse("Error inesperado", LocalDateTime.now(),false), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ApiResponse("Error inesperado", LocalDateTime.now().toString(),false), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

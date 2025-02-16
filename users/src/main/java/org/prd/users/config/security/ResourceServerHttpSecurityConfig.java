@@ -17,6 +17,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -58,5 +61,18 @@ public class ResourceServerHttpSecurityConfig {
 
         return jwtAuthenticationConverter;
     }
+
+
+    /*@Bean
+    public CorsConfigurationSource corsConfigurationSource(){
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration cors = new CorsConfiguration();
+        cors.addAllowedHeader("*");
+        cors.addAllowedMethod("*");
+        cors.setAllowCredentials(true);
+        cors.addAllowedOrigin("*");
+        source.registerCorsConfiguration("/**", cors);
+        return source;
+    }*/
 
 }

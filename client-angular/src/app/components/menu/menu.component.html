@@ -1,0 +1,21 @@
+<mat-toolbar>
+    <button mat-icon-button >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>My App</span>
+    <span class="example-spacer"></span>
+    <div class="container">
+      @if (!isLoggedIn) {
+        <button mat-flat-button (click)="onLogin()">
+        Login
+      </button>
+      }@else {
+        <button mat-stroked-button (click)="onLogout()">
+          Logout
+        </button>
+      }
+      
+  
+      <mat-slide-toggle [(ngModel)]="isChecked" (toggleChange)="themeService.toggleTheme()"><mat-icon>wb_sunny</mat-icon></mat-slide-toggle>
+    </div>
+  </mat-toolbar>

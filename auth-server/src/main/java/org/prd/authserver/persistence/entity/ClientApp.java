@@ -8,13 +8,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -30,17 +32,19 @@ public class ClientApp {
     private String clientName;
     private List<String> authenticationMethods;
     private List<String> authorizationGrantTypes;
+    private List<String> postLogoutRedirectUris;
     private List<String> redirectUris;
     private List<String> scopes;
     private int durationInMinutes;
     private boolean requireProofKey;
 
 
-
     public static RegisteredClient toRegisteredClient(ClientApp clientApp) {
-        return RegisteredClient.withId(clientApp.getClientId())
+        return RegisteredClient.withId(clientApp.getId())
                 .clientId(clientApp.getClientId())
+                //.clientIdIssuedAt(null)
                 .clientSecret(clientApp.getClientSecret())
+                //.clientSecretExpiresAt(null)
                 .clientName(clientApp.getClientName())
                 .authorizationGrantTypes(gts->{
                     gts.addAll(clientApp.getAuthorizationGrantTypes().stream().map(AuthorizationGrantType::new).toList());
@@ -51,7 +55,9 @@ public class ClientApp {
                 .redirectUris(rus ->{
                     rus.addAll(clientApp.getRedirectUris());
                 })
-                //.postLogoutRedirectUris(clientApp.getPostLogoutRedirectUris())
+                .postLogoutRedirectUris(plrus->{
+                    plrus.addAll(clientApp.getPostLogoutRedirectUris());
+                })
                 .scopes(scopes->{
                     scopes.addAll(clientApp.getScopes());
                 })

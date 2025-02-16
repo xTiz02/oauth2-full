@@ -12,13 +12,21 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -37,9 +45,14 @@ public class HttpSecurityConfig {
         //Oauth2 autorización +
         //OpenID Autenticación +
         //OpenID Connect 1.0 =
+        /*
+        * Al habilitar OpenID Connect 1.0 se configurará automáticamente la compatibilidad del
+        * servidor de recursos que permite que las solicitudes de información del usuario se
+        * autentiquen con tokens de acceso.*/
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 OAuth2AuthorizationServerConfigurer.authorizationServer();
 
+        http.cors(Customizer.withDefaults());
         http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer
@@ -65,18 +78,42 @@ public class HttpSecurityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
             throws Exception {
+
+        http.cors(Customizer.withDefaults());
         http.authorizeHttpRequests((authorize) ->{
-                    //authorize.requestMatchers("/login").permitAll();
+                    authorize.requestMatchers("/login").permitAll();
                     authorize.anyRequest().authenticated();
             })
-            .formLogin(Customizer.withDefaults());
-            /*.formLogin((formLogin) -> formLogin
+            //.formLogin(Customizer.withDefaults());
+            .formLogin((formLogin) -> formLogin
                     .loginPage("/login")
                     .permitAll()
-            );*/
+            );
+        http.oauth2Login((oauth2Login) -> oauth2Login
+                .loginPage("/login")
+        );
+        http.logout((logout) -> logout
+                .logoutSuccessUrl("http://localhost:4200/home")
+        );
 
         return http.build();
     }
+
+    /*@Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
+    @Bean
+    public OAuth2AuthorizationService authorizationService() {
+        return new InMemoryOAuth2AuthorizationService();
+    }*/
+
     /*
     * tokens->{
     *       JWT = HEADER.PAYLOAD.SIGNATURE  HS256* FIRMADO
@@ -116,7 +153,20 @@ public class HttpSecurityConfig {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer("http://micro-auth-server:9595/authorization-server") //Pregunta como decodificar el token
+                .issuer("http://localhost:9595/authorization-server") //Pregunta como decodificar el token
                 .build();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(){
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration cors = new CorsConfiguration();
+        cors.addAllowedHeader("*");
+        cors.addAllowedMethod("*");
+        cors.setAllowCredentials(true);
+        cors.addAllowedOrigin("http://localhost:4200");
+        source.registerCorsConfiguration("/**", cors);
+        return source;
     }
 }

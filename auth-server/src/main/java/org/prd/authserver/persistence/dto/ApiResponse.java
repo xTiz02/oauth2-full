@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record ApiResponse(
         String message,
-        LocalDateTime timestamp,
+        String timestamp,
         boolean success
 ) {
 }

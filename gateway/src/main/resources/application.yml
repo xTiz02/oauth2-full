@@ -1,6 +1,10 @@
 #Eureka
 eureka:
+  instance:
+    instance-id: true
   client:
+    fetch-registry: true
+    register-with-eureka: true
     service-url:
       defaultZone: http://discover1:secret1@localhost:8761/eureka
 
@@ -13,25 +17,25 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: authenticator
-          uri: lb://micro-auth-server/authorization-server
+        - id: create-client
+          uri: lb://micro-auth-server
           predicates:
-            - Path=/route/oauth2/authorize
+            - Path=/route/authorization-server/create-client
           filters:
             - StripPrefix=1
-            - name: AuthenticationRequestFilter
-              args:
-                message: Request [ ${spring.cloud.gateway.routes[0].uri} ]
-                preLogger: true
-                postLogger: true
-        - id: token
-          uri: lb://micro-auth-server/authorization-server
+#            - name: AuthenticationRequestFilter
+#              args:
+#                message: Request [ ${spring.cloud.gateway.routes[0].uri} ]
+#                preLogger: true
+#                postLogger: true
+        - id: users-service
+          uri: lb://micro-users
           predicates:
-            - Path=/route/oauth2/authorize/token
+            - Path=/route/users/**
           filters:
             - StripPrefix=1
             - name: TokenRequestFilter
               args:
-                message: Request [ ${spring.cloud.gateway.routes[1].uri} ]
+                message: Request [ ${spring.cloud.gateway.routes[0].uri} ]
                 preLogger: true
                 postLogger: true

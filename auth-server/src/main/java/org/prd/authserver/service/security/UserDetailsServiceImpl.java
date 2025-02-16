@@ -1,6 +1,7 @@
 package org.prd.authserver.service.security;
 
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.prd.authserver.persistence.dto.ApiResponse;
 import org.prd.authserver.persistence.dto.UserDetailsDto;
 import org.prd.authserver.service.feign.UserFeignService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -28,6 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         UserDetailsDto userDetailsDto = null;
         try{
             userDetailsDto = userFeignService.getUserByUsername(username);
@@ -36,8 +39,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 ApiResponse apiResponse = Util.getClassFromBytes(e.responseBody().get().array(), ApiResponse.class);
                 throw new ObjectNotFoundException(apiResponse.message());
             }
+        }catch (Exception e){
+            throw new ObjectNotFoundException("Error inesperado al obtener el usurario [" + username+ "]");
         }
         assert userDetailsDto != null;
+        log.info("Usuario encontrado: {}", userDetailsDto);
+
         List<GrantedAuthority> authorities = new ArrayList<>();
         userDetailsDto.permissions().forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission)));
         authorities.add(new SimpleGrantedAuthority(userDetailsDto.role()));

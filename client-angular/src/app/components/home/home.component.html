@@ -1,0 +1,6 @@
+
+<h1 style="text-align: center;">Bienvenido, verifica tu rol !</h1>
+<div style="display: flex; justify-content: center;">
+    <button mat-raised-button (click)='redirectUser("user")' [disabled]="btnDisabled">User Role</button>
+    <button  mat-flat-button (click)='redirectUser("admin")' [disabled]="btnDisabled">Admin Role</button>
+</div>

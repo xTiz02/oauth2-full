@@ -21,10 +21,15 @@ import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Mono;
 import java.net.URI;
 
-@Slf4j
+
 @Component
 public class AuthenticationRequestFilter extends AbstractGatewayFilterFactory<FilterConfig> {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
+
+    public AuthenticationRequestFilter() {
+        super(FilterConfig.class);
+    }
 
     @Override
     public GatewayFilter apply(FilterConfig config) {
