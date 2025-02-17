@@ -5,6 +5,9 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.prd.authserver.service.federated.FederatedIdentityAuthenticationSuccessHandler;
+import org.prd.authserver.service.federated.UserRepositoryOAuth2UserHandler;
+import org.prd.authserver.service.security.CustomLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -12,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -21,7 +25,9 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -38,6 +44,12 @@ import java.util.UUID;
 @Configuration
 public class HttpSecurityConfig {
 
+    private final UserRepositoryOAuth2UserHandler userRepositoryOAuth2UserHandler;
+
+    public HttpSecurityConfig(UserRepositoryOAuth2UserHandler userRepositoryOAuth2UserHandler) {
+        this.userRepositoryOAuth2UserHandler = userRepositoryOAuth2UserHandler;
+    }
+
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
@@ -52,7 +64,9 @@ public class HttpSecurityConfig {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 OAuth2AuthorizationServerConfigurer.authorizationServer();
 
+
         http.cors(Customizer.withDefaults());
+        http.csrf(AbstractHttpConfigurer::disable);
         http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
                         authorizationServer
@@ -80,6 +94,7 @@ public class HttpSecurityConfig {
             throws Exception {
 
         http.cors(Customizer.withDefaults());
+        http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests((authorize) ->{
                     authorize.requestMatchers("/login").permitAll();
                     authorize.anyRequest().authenticated();
@@ -90,14 +105,29 @@ public class HttpSecurityConfig {
                     .permitAll()
             );
         http.oauth2Login((oauth2Login) -> oauth2Login
-                .loginPage("/login")
+                .loginPage("/login").successHandler(authenticationSuccessHandler())
         );
         http.logout((logout) -> logout
-                .logoutSuccessUrl("http://localhost:4200/home")
+                //.logoutUrl("/logout")
+                //.logoutSuccessUrl("http://localhost:4200/home")
+                .deleteCookies("JSESSIONID")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                .logoutSuccessHandler(logoutSuccessHandler())
         );
 
         return http.build();
     }
+
+
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return new CustomLogoutSuccessHandler();
+    }
+
+    private AuthenticationSuccessHandler authenticationSuccessHandler(){
+        return new FederatedIdentityAuthenticationSuccessHandler(userRepositoryOAuth2UserHandler);
+    }
+
 
     /*@Bean
     public SessionRegistry sessionRegistry() {
@@ -107,8 +137,9 @@ public class HttpSecurityConfig {
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
-    }
+    }*/
 
+    /*
     @Bean
     public OAuth2AuthorizationService authorizationService() {
         return new InMemoryOAuth2AuthorizationService();

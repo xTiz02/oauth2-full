@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-logout',
@@ -7,5 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './logout.component.scss'
 })
 export class LogoutComponent {
+  tokenService = inject(TokenService);
 
+  ngOnInit(){
+    this.tokenService.clear();
+  }
 }

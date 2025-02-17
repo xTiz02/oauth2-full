@@ -10,5 +10,6 @@ export const environment = {
     grant_type: 'authorization_code',
     resource_url: 'http://localhost:8081/users/',
     logout_url: 'http://localhost:9595/authorization-server/logout',
+    post_logout_redirect_uri: 'http://localhost:4200/logout',
     secret_pkce: 'secret'
   };

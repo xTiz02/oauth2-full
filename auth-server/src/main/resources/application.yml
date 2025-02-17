@@ -14,8 +14,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 111
-            client-secret: 111
+            client-id: 1111
+            client-secret: 1111
             scope:
               - email
               - profile

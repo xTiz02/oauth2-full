@@ -8,6 +8,7 @@ import {FormsModule,} from '@angular/forms';
 import { TokenService } from '../../services/token.service';
 import { environment } from '../../../environments/environment';
 import { HttpParams } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-menu',
@@ -18,6 +19,7 @@ import { HttpParams } from '@angular/common/http';
 export class MenuComponent {
   readonly themeService = inject(ThemeService);
   tokenService = inject(TokenService);
+  authService = inject(AuthService);
   authorize_uri = environment.authorize_uri;
   logout_url = environment.logout_url;
   isChecked:boolean = false;
@@ -50,7 +52,18 @@ export class MenuComponent {
   }
   
   onLogout(): void {
-    location.href = this.logout_url;
+    const httpParams = new HttpParams({fromObject: {post_logout_redirect_uri: environment.post_logout_redirect_uri}});
+    location.href = this.logout_url + '?' + httpParams.toString();
+    // this.authService.logout().subscribe(
+    //   data => {
+    //     console.log(data);
+    //     this.tokenService.clear();
+    //     this.isLoggedIn = false;
+    //   },
+    //   err => {
+    //     console.log(err);
+    //   }
+    // );
   }
 
   // generateCodeVerifier(): string {

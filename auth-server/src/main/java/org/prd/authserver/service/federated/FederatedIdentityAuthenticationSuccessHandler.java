@@ -22,6 +22,10 @@ public class FederatedIdentityAuthenticationSuccessHandler implements Authentica
 
     private Consumer<OidcUser> oidcUserHandler = (user) -> this.oauth2UserHandler.accept(user);
 
+
+    public FederatedIdentityAuthenticationSuccessHandler(Consumer<OAuth2User> oauth2UserHandler) {
+        this.oauth2UserHandler = oauth2UserHandler;
+    }
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         if (authentication instanceof OAuth2AuthenticationToken) {

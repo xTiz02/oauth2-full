@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
@@ -11,6 +11,7 @@ export class AuthService {
   private httpClient:HttpClient = inject(HttpClient);
 
   token_url = environment.token_url;
+  logout_url = environment.logout_url;
 
   constructor() { }
 
@@ -32,4 +33,10 @@ export class AuthService {
     const httpOptions = { headers: headers_object};
     return this.httpClient.post<any>(this.token_url, body, httpOptions);
   }
+
+  // public logout(): Observable<any> {
+  //   const httpParams = new HttpParams({fromObject: {post_logout_redirect_uri: environment.post_logout_redirect_uri}});
+  //   location.href = this.logout_url + '?' + httpParams.toString();
+  //   return this.httpClient.get<any>(this.logout_url + "?" + httpParams.toString());
+  // }
 }
