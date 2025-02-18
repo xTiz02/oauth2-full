@@ -39,7 +39,9 @@ export class MenuComponent {
   }
 
   ngOnInit(){
-    
+    if(this.tokenService.getAccessToken()){
+      this.authService.toLogged();
+    }
   }
   toHome(){
     location.href = '/home';
