@@ -23,8 +23,9 @@ export class HomeComponent {
 
 
   ngOnInit(): void {
-    if(this.tokenService.isLogged()){
-      this.enableButtons();
+    if(this.tokenService.getAccessToken()){
+      this.authService.toLogged();
+      this.btnDisabled = false;
     }else{
       this.activatedRoute.queryParams.subscribe( data => {
         const code = data['code'];
@@ -43,19 +44,14 @@ export class HomeComponent {
     this.authService.getToken(code).subscribe(
       data => {
         console.log(data);
-        this.tokenService.setTokens(data.access_token, data.refresh_token);
-        this.enableButtons();
+        this.tokenService.setTokens(data.access_token, data.refresh_token, data.id_token);
+        this.authService.toLogged();
+        this.btnDisabled = false;
       },
       err => {
         console.log(err);
       }
     );
-  }
-
-  enableButtons(): void {
-    if(this.tokenService.isLogged()){
-      this.btnDisabled = false;
-    }
   }
 
   redirectUser(action: string): void {

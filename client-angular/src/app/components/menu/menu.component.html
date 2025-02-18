@@ -1,11 +1,11 @@
 <mat-toolbar>
-    <button mat-icon-button >
-      <mat-icon>menu</mat-icon>
+    <button mat-icon-button (click)="toHome()">
+      <mat-icon>home</mat-icon>
     </button>
     <span>My App</span>
     <span class="example-spacer"></span>
     <div class="container">
-      @if (!isLoggedIn) {
+      @if (!isLoggedIn()) {
         <button mat-flat-button (click)="onLogin()">
         Login
       </button>

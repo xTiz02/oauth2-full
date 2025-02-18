@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { TokenService } from '../../services/token.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-logout',
@@ -9,8 +10,9 @@ import { TokenService } from '../../services/token.service';
 })
 export class LogoutComponent {
   tokenService = inject(TokenService);
-
+  authServ = inject(AuthService);
   ngOnInit(){
     this.tokenService.clear();
+    this.authServ.toLoggedOut();
   }
 }

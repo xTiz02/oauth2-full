@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, single } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +9,25 @@ import { Observable } from 'rxjs';
 export class AuthService {
 
   private httpClient:HttpClient = inject(HttpClient);
-
+  #logged = signal<boolean>(false);
+  logged = computed(() => this.#logged);
   token_url = environment.token_url;
   logout_url = environment.logout_url;
-
+  
   constructor() { }
+
+  isLogged(): boolean {
+    return this.logged()();
+  }
+
+
+  toLogged(): void {
+    this.#logged.set(true);
+  }
+
+  toLoggedOut(): void {
+    this.#logged.set(false);
+  }
 
 
   public getToken(code: string): Observable<any> {

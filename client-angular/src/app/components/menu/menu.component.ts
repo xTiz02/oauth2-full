@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, Signal, computed, inject } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -23,7 +23,7 @@ export class MenuComponent {
   authorize_uri = environment.authorize_uri;
   logout_url = environment.logout_url;
   isChecked:boolean = false;
-  isLoggedIn:boolean = false;
+  isLoggedIn: Signal<boolean> = this.authService.logged();
 
   params: any = {
     client_id: environment.client_id,
@@ -39,10 +39,13 @@ export class MenuComponent {
   }
 
   ngOnInit(){
-    this.isLoggedIn = this.tokenService.isLogged();
+    
+  }
+  toHome(){
+    location.href = '/home';
   }
 
-  onLogin(): void {
+  onLogin(): void { 
     //const code_verifier = this.generateCodeVerifier();
     //this.tokenService.setVerifier(code_verifier);
     //this.params.code_challenge = this.generateCodeChallenge(code_verifier);
@@ -54,6 +57,7 @@ export class MenuComponent {
   onLogout(): void {
     const httpParams = new HttpParams({fromObject: {post_logout_redirect_uri: environment.post_logout_redirect_uri}});
     location.href = this.logout_url + '?' + httpParams.toString();
+    
     // this.authService.logout().subscribe(
     //   data => {
     //     console.log(data);

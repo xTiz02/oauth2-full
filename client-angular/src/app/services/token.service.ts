@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 const ACCESS_TOKEN = 'access_token';
 const REFRESH_TOKEN = 'refresh_token';
+const ID_TOKEN = 'id_token';
 const CODE_VERIFIER = 'code_verifier';
 
 
@@ -14,11 +15,14 @@ export class TokenService {
   constructor() { }
 
 
-  setTokens(access_token: string, refresh_token: string): void {
+  setTokens(access_token: string, refresh_token: string,id_token:string): void {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.setItem(ACCESS_TOKEN, access_token);
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.setItem(REFRESH_TOKEN, refresh_token);
+    localStorage.removeItem(ID_TOKEN);
+    localStorage.setItem(ID_TOKEN, id_token);
+
   }
 
   getAccessToken(): string | null {
@@ -28,9 +32,14 @@ export class TokenService {
   getRefreshToken(): string | null {
     return localStorage.getItem(REFRESH_TOKEN);
   }
+
+  getIdToken(): string | null {
+    return localStorage.getItem(ID_TOKEN);
+  }
   clear(): void {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
+    localStorage.removeItem(ID_TOKEN);
   }
 
   isLogged(): boolean {
